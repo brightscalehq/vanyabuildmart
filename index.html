@@ -1,0 +1,754 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BuildMart — Premium Building Materials</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+
+<!-- CSS — appearance only -->
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- ============================================================
+     TOAST NOTIFICATION
+     ============================================================ -->
+<div id="toast" class="toast">Notification</div>
+
+<!-- ============================================================
+     MAIN HEADER
+     Edit logo, search placeholder, account labels directly here.
+     ============================================================ -->
+<header class="top-header">
+
+    <!-- LOGO — replace the SVG inside .logo-mark-top to change logo -->
+    <a class="top-header-logo" href="#" onclick="navigate('home');return false;">
+        <div class="logo-mark-top">
+            <svg viewBox="0 0 32 32" fill="none">
+                <path d="M4 28V14L16 4L28 14V28H20V20H12V28H4Z" fill="#202124" stroke="#F4B400" stroke-width="1.8" stroke-linejoin="round"/>
+                <path d="M16 4L28 14" stroke="#F4B400" stroke-width="2.4" stroke-linecap="round"/>
+                <path d="M16 4L4 14" stroke="#D99A00" stroke-width="2" stroke-linecap="round"/>
+                <rect x="13" y="20" width="6" height="8" rx="0.8" fill="#F4B400"/>
+            </svg>
+        </div>
+        <div>
+            <div class="logo-wordmark-top">Build<span>Mart</span></div>
+            <span class="logo-tag-top">Build Better. Live Better.</span>
+        </div>
+    </a>
+
+    <!-- DELIVER-TO -->
+    <div class="deliver-block" onclick="showToast('Location selector coming soon')">
+        <svg class="bm-icon" viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+        <div class="deliver-info">
+            <span class="deliver-label">Deliver to</span>
+            <span class="deliver-value">Select Location
+                <svg class="bm-icon" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+            </span>
+        </div>
+    </div>
+
+    <!-- SEARCH BAR -->
+    <div class="search-bar-top">
+        <select class="search-cat-select" id="searchCategory">
+            <option value="all">All</option>
+            <option>Cement</option><option>Roofing</option><option>Steel</option>
+            <option>Plumbing</option><option>Electrical</option><option>Paints</option>
+            <option>Tiles</option><option>Tools</option><option>Hardware</option>
+        </select>
+        <input type="text" id="globalSearchInput"
+               placeholder="Search building materials, tools and more..."
+               onkeyup="handleSearch(event)">
+        <button class="search-submit" onclick="submitSearch()" aria-label="Search">
+            <svg class="bm-icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        </button>
+    </div>
+
+    <!-- ACCOUNT / CART -->
+    <div class="header-right-top">
+        <div class="header-item" onclick="navigate('login')">
+            <span class="header-item-line1">Hello, sign in</span>
+            <span class="header-item-line2">Account
+                <svg class="bm-icon" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+            </span>
+        </div>
+        <div class="header-item" onclick="navigate('account')">
+            <span class="header-item-line1">Returns</span>
+            <span class="header-item-line2">& Orders</span>
+        </div>
+        <div class="header-item cart-item" onclick="navigate('cart')">
+            <svg class="bm-icon" viewBox="0 0 24 24"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+            <span class="cart-count" id="cart-count">0</span>
+            <span class="cart-label">Cart</span>
+        </div>
+    </div>
+</header>
+
+<!-- ============================================================
+     CATEGORY NAV — static links below. Add / remove <div> freely.
+     ============================================================ -->
+<nav class="nav-bar" id="categoryNav">
+    <div class="nav-all" onclick="navigate('category','All')">
+        <svg class="bm-icon" viewBox="0 0 24 24">
+            <line x1="3" y1="12" x2="21" y2="12"/>
+            <line x1="3" y1="6" x2="21" y2="6"/>
+            <line x1="3" y1="18" x2="21" y2="18"/>
+        </svg>
+        All Categories
+    </div>
+    <a class="nav-link" href="#" >Cement & Concrete</a>
+    <a class="nav-link" href="#" >Steel & Metal</a>
+    <a class="nav-link" href="#" >Roofing</a>
+    <a class="nav-link" href="#" >Lumber & Wood</a>
+    <a class="nav-link" href="#" >Tools & Equipment</a>
+    <a class="nav-link" href="#" >Electrical</a>
+    <a class="nav-link" href="#" >Plumbing</a>
+    <a class="nav-link" href="#" >Paints & Finishes</a>
+    <a class="nav-link" href="#" >Tiles</a>
+    <a class="nav-link" href="#" >Doors</a>
+    <a class="nav-link" href="#" >Hardware</a>
+</nav>
+
+<!-- ============================================================
+     MAIN CONTENT — pages rendered here by router (app.js).
+     ============================================================ -->
+<main class="main-content" id="app-container">
+
+    <!-- ==========================================================
+         HOME PAGE  (statically written — full HTML control)
+         Remove a <section> to remove it. Copy one to add another.
+         ========================================================== -->
+
+    <!-- HERO CAROUSEL -->
+    <div class="hero-carousel-wrap" id="heroWrap">
+        <div class="hero-carousel-viewport">
+            <div class="hero-carousel-track" id="heroTrack">
+
+                <!-- HERO SLIDE 1 -->
+                <a class="hero-card" href="#">
+                    <h3 class="hero-card-headline">Build Strong from the Ground Up</h3>
+                    <div class="hero-card-media">
+                        <img src="assets/BuildMart Building Materials Showcase - Copy.png"
+                             alt="Cement building materials" loading="eager">
+                    </div>
+                    <div class="hero-card-cta">Shop Now
+                        <svg class="bm-icon" viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+                    </div>
+                </a>
+
+                <!-- HERO SLIDE 2 -->
+                <a class="hero-card" href="#">
+                    <h3 class="hero-card-headline">Quality Roofing for Every Project</h3>
+                    <div class="hero-card-media">
+                        <img src="assets/BuildMart Building Materials Showcase - Copy (2).png"
+                             alt="Roofing materials" loading="lazy">
+                    </div>
+                    <div class="hero-card-cta">Shop Now
+                        <svg class="bm-icon" viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+                    </div>
+                </a>
+
+                <!-- HERO SLIDE 3 -->
+                <a class="hero-card" href="#" >
+                    <h3 class="hero-card-headline">The Right Tools for Every Job</h3>
+                    <div class="hero-card-media">
+                        <img src="assets/BuildMart Building Materials Showcase - Copy (3).png"
+                             alt="Power tools" loading="lazy">
+                    </div>
+                    <div class="hero-card-cta">Shop Now
+                        <svg class="bm-icon" viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+                    </div>
+                </a>
+
+                <!-- HERO SLIDE 4 -->
+                <a class="hero-card" href="#" >
+                    <h3 class="hero-card-headline">Give Every Space a Beautiful Finish</h3>
+                    <div class="hero-card-media">
+                        <img src="assets/BuildMart Building Materials Showcase - Copy (2).png"
+                             alt="Tiles and interiors" loading="lazy">
+                    </div>
+                    <div class="hero-card-cta">Shop Now
+                        <svg class="bm-icon" viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+                    </div>
+                </a>
+
+                <!-- HERO SLIDE 5 -->
+                <a class="hero-card" href="#">
+                    <h3 class="hero-card-headline">Structural Steel You Can Trust</h3>
+                    <div class="hero-card-media">
+                        <img src="assets/BuildMart Building Materials Showcase - Copy.png"
+                             alt="Steel rods" loading="lazy">
+                    </div>
+                    <div class="hero-card-cta">Shop Now
+                        <svg class="bm-icon" viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+                    </div>
+                </a>
+
+                <!-- HERO SLIDE 6 -->
+                <a class="hero-card" href="#">
+                    <h3 class="hero-card-headline">Premium Paint for Every Wall</h3>
+                    <div class="hero-card-media">
+                        <img src="assets/BuildMart Building Materials Showcase - Copy (2).png"
+                             alt="Paint products" loading="lazy">
+                    </div>
+                    <div class="hero-card-cta">Shop Now
+                        <svg class="bm-icon" viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+                    </div>
+                </a>
+            </div>
+        </div>
+        <button class="hero-arrow hero-arrow-left" id="heroPrev" aria-label="Previous">
+            <svg class="bm-icon bm-icon-sm" viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
+        </button>
+        <button class="hero-arrow hero-arrow-right" id="heroNext" aria-label="Next">
+            <svg class="bm-icon bm-icon-sm" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
+        </button>
+    </div>
+
+<!-- SHOP BY CATEGORY -->
+<section class="section-block">
+    <div class="section-header">
+        <div>
+            <h2 class="section-title">Shop by Category</h2>
+            <p class="section-title-sub">Everything you need for your build</p>
+        </div>
+    </div>
+    <div class="cat-grid">
+
+        <!-- CATEGORY: CEMENT & CONCRETE -->
+        <!-- REPLACE IMAGE: images/categories/cement.jpg -->
+        <a class="cat-tile" href="#">
+            <div class="cat-tile-media">
+                <img src="assets/cate/cement.png" alt="Cement and Concrete" loading="lazy">
+            </div>
+            <div class="cat-tile-name">Cement & Concrete</div>
+        </a>
+
+        <!-- CATEGORY: STEEL & METAL -->
+        <!-- REPLACE IMAGE: images/categories/steel.jpg -->
+        <a class="cat-tile" href="#" onclick="navigate('category','Steel');return false;">
+            <div class="cat-tile-media">
+                <img src="assets/cate/steel.png" alt="Steel and Metal" loading="lazy">
+            </div>
+            <div class="cat-tile-name">Steel & Metal</div>
+        </a>
+
+        <!-- CATEGORY: ROOFING -->
+        <!-- REPLACE IMAGE: images/categories/roofing.jpg -->
+        <a class="cat-tile" href="#" onclick="navigate('category','Roofing');return false;">
+            <div class="cat-tile-media">
+                <img src="assets/cate/roof.png" alt="Roofing Sheets" loading="lazy">
+            </div>
+            <div class="cat-tile-name">Roofing</div>
+        </a>
+
+        <!-- CATEGORY: LUMBER & WOOD -->
+        <!-- REPLACE IMAGE: images/categories/timber.jpg -->
+        <a class="cat-tile" href="#" onclick="navigate('category','Timber');return false;">
+            <div class="cat-tile-media">
+                <img src="assets/cate/lumber.png" alt="Lumber and Wood" loading="lazy">
+            </div>
+            <div class="cat-tile-name">Lumber & Wood</div>
+        </a>
+
+        <!-- CATEGORY: TOOLS & EQUIPMENT -->
+        <!-- REPLACE IMAGE: images/categories/tools.jpg -->
+        <a class="cat-tile" href="#" onclick="navigate('category','Tools');return false;">
+            <div class="cat-tile-media">
+                <img src="assets/cate/tools.png" alt="Tools and Equipment" loading="lazy">
+            </div>
+            <div class="cat-tile-name">Tools & Equipment</div>
+        </a>
+
+        <!-- CATEGORY: ELECTRICAL -->
+        <!-- REPLACE IMAGE: images/categories/electrical.jpg -->
+        <a class="cat-tile" href="#" onclick="navigate('category','Electrical');return false;">
+            <div class="cat-tile-media">
+                <img src="assets/cate/electrical.png" alt="Electrical Supplies" loading="lazy">
+            </div>
+            <div class="cat-tile-name">Electrical</div>
+        </a>
+
+        <!-- CATEGORY: PLUMBING -->
+        <!-- REPLACE IMAGE: images/categories/plumbing.jpg -->
+        <a class="cat-tile" href="#" onclick="navigate('category','Plumbing');return false;">
+            <div class="cat-tile-media">
+                <img src="assets/cate/plumbing.png" alt="Plumbing Supplies" loading="lazy">
+            </div>
+            <div class="cat-tile-name">Plumbing</div>
+        </a>
+
+        <!-- CATEGORY: PAINTS & FINISHES -->
+        <!-- REPLACE IMAGE: images/categories/paints.jpg -->
+        <a class="cat-tile" href="#" onclick="navigate('category','Paints');return false;">
+            <div class="cat-tile-media">
+                <img src="assets/cate/paint.png" alt="Paints and Finishes" loading="lazy">
+            </div>
+            <div class="cat-tile-name">Paints & Finishes</div>
+        </a>
+
+        <!-- CATEGORY: TILES -->
+        <!-- REPLACE IMAGE: images/categories/tiles.jpg -->
+        <a class="cat-tile" href="#" onclick="navigate('category','Tiles');return false;">
+            <div class="cat-tile-media">
+                <img src="assets/cate/tiles.png" alt="Ceramic and Floor Tiles" loading="lazy">
+            </div>
+            <div class="cat-tile-name">Tiles</div>
+        </a>
+
+        <!-- CATEGORY: DOORS -->
+        <!-- REPLACE IMAGE: images/categories/doors.jpg -->
+        <a class="cat-tile" href="#" onclick="navigate('category','Doors');return false;">
+            <div class="cat-tile-media">
+                <img src="assets/cate/doors.png" alt="Wooden Doors" loading="lazy">
+            </div>
+            <div class="cat-tile-name">Doors</div>
+        </a>
+
+        <!-- CATEGORY: HARDWARE -->
+        <!-- REPLACE IMAGE: images/categories/hardware.jpg -->
+        <a class="cat-tile" href="#" onclick="navigate('category','Hardware');return false;">
+            <div class="cat-tile-media">
+                <img src="assets/cate/nuts.png" alt="Hardware Materials" loading="lazy">
+            </div>
+            <div class="cat-tile-name">Hardware</div>
+        </a>
+
+        <!-- CATEGORY: WATER TANKS -->
+        <!-- REPLACE IMAGE: images/categories/tanks.jpg -->
+        <a class="cat-tile" href="#" onclick="navigate('category','Tanks');return false;">
+            <div class="cat-tile-media">
+                <img src="assets/cate/tanks.png" alt="Water Storage Tanks" loading="lazy">
+            </div>
+            <div class="cat-tile-name">Water Tanks</div>
+        </a>
+    </div>
+</section>
+
+    <!-- BEST SELLING PRODUCTS — static product cards, edit freely -->
+    <section class="section-block">
+        <div class="section-header">
+            <h2 class="section-title">Best Selling Products</h2>
+            <a class="section-see-more" href="#">See more
+                <svg class="bm-icon" viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+            </a>
+        </div>
+        <div class="product-grid">
+
+            <!-- PRODUCT CARD 1 -->
+            <article class="product-card" >
+                <div class="product-media">
+                    <img src="assets/cement.png" alt="Dangote 3X Cement" loading="lazy">
+                    <span class="product-badge best">Best Seller</span>
+                    <span class="product-discount">-10%</span>
+                </div>
+                <div class="product-body">
+                    <div class="product-name" title="Dangote 3X Cement — 50kg Bag">Cement — 50kg Bag</div>
+                    <div class="product-rating-row">3
+                        <span class="product-stars">
+                            <svg class="bm-icon" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                            <svg class="bm-icon" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                            <svg class="bm-icon" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                            <svg class="bm-icon" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                            <svg class="bm-icon off" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                        </span>
+                        <span class="product-review">4.5 (128)</span>
+                    </div>
+                    <div class="product-unit">Per 50kg bag</div>
+                    <div class="product-price-row">
+                        <span class="product-price-now">D450</span>
+                        <span class="product-price-was">D500</span>
+                    </div>
+                    <div class="product-stock"><span class="dot"></span>In Stock</div>
+                    <div class="product-delivery">
+                        <svg class="bm-icon bm-icon-xs" viewBox="0 0 24 24"><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
+                        Delivery in 1–2 days
+                    </div>
+                    <button class="add-cart-btn" onclick="event.stopPropagation(); addToCart(1)">
+                        Add to Cart
+                    </button>
+                </div>
+            </article>
+
+            <!-- PRODUCT CARD 2 -->
+            <article class="product-card">
+                <div class="product-media">
+                    <img src="assets/rod.png" alt="High-Strength Steel Rod" loading="lazy">
+                    <span class="product-badge sale">Sale</span>
+                    <span class="product-discount">-14%</span>
+                </div>
+                <div class="product-body">
+                    <div class="product-name">High-Strength Steel Rod — 12mm</div>
+                    <div class="product-rating-row">
+                        <span class="product-stars">
+                            <svg class="bm-icon" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                            <svg class="bm-icon" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                            <svg class="bm-icon" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                            <svg class="bm-icon" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                            <svg class="bm-icon" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                        </span>
+                        <span class="product-review">4.8 (92)</span>
+                    </div>
+                    <div class="product-unit">Per 12m length</div>
+                    <div class="product-price-row">
+                        <span class="product-price-now">D1,200</span>
+                        <span class="product-price-was">D1,400</span>
+                    </div>
+                    <div class="product-stock"><span class="dot"></span>In Stock</div>
+                    <div class="product-delivery">
+                        <svg class="bm-icon bm-icon-xs" viewBox="0 0 24 24"><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
+                        Delivery in 2–3 days
+                    </div>
+                    <button class="add-cart-btn" onclick="event.stopPropagation(); addToCart(2)">Add to Cart</button>
+                </div>
+            </article>
+
+            <!-- PRODUCT CARD 3 -->
+            <article class="product-card">
+                <div class="product-media">
+                    <img src="assets/steel.png" alt="Quality Zinc Roofing Sheet" loading="lazy">
+                    <span class="product-badge new">New</span>
+                </div>
+                <div class="product-body">
+                    <div class="product-name">Quality Zinc Roofing Sheet</div>
+                    <div class="product-rating-row">
+                        <span class="product-stars">
+                            <svg class="bm-icon" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                            <svg class="bm-icon" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                            <svg class="bm-icon" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                            <svg class="bm-icon" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                            <svg class="bm-icon off" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                        </span>
+                        <span class="product-review">4.2 (64)</span>
+                    </div>
+                    <div class="product-unit">Per sheet</div>
+                    <div class="product-price-row">
+                        <span class="product-price-now">D850</span>
+                        <span class="product-price-was">D950</span>
+                    </div>
+                    <div class="product-stock"><span class="dot"></span>In Stock</div>
+                    <div class="product-delivery">
+                        <svg class="bm-icon bm-icon-xs" viewBox="0 0 24 24"><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
+                        Delivery in 2–4 days
+                    </div>
+                    <button class="add-cart-btn" onclick="event.stopPropagation(); addToCart(3)">Add to Cart</button>
+                </div>
+            </article>
+
+            <!-- PRODUCT CARD 4 -->
+            <article class="product-card" >
+                <div class="product-media">
+                    <img src="assets/pvc pipe.png" alt="PVC Pipe 4 inch" loading="lazy">
+                    <span class="product-discount">-13%</span>
+                </div>
+                <div class="product-body">
+                    <div class="product-name">PVC Pipe — 4 inch</div>
+                    <div class="product-rating-row">
+                        <span class="product-stars">
+                            <svg class="bm-icon" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                            <svg class="bm-icon" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                            <svg class="bm-icon" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                            <svg class="bm-icon" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                            <svg class="bm-icon" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                        </span>
+                        <span class="product-review">4.6 (47)</span>
+                    </div>
+                    <div class="product-unit">Per 6m length</div>
+                    <div class="product-price-row">
+                        <span class="product-price-now">D350</span>
+                        <span class="product-price-was">D400</span>
+                    </div>
+                    <div class="product-stock"><span class="dot"></span>In Stock</div>
+                    <div class="product-delivery">
+                        <svg class="bm-icon bm-icon-xs" viewBox="0 0 24 24"><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
+                        Delivery in 1–2 days
+                    </div>
+                    <button class="add-cart-btn" onclick="event.stopPropagation(); addToCart(4)">Add to Cart</button>
+                </div>
+            </article>
+
+            <!-- PRODUCT CARD 5 -->
+            <article class="product-card" >
+                <div class="product-media">
+                    <img src="assets/paint.png" alt="Premium Wall Paint" loading="lazy">
+                    <span class="product-badge best">Best Seller</span>
+                    <span class="product-discount">-11%</span>
+                </div>
+                <div class="product-body">
+                    <div class="product-name">Premium Wall Paint — White (20L)</div>
+                    <div class="product-rating-row">
+                        <span class="product-stars">
+                            <svg class="bm-icon" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                            <svg class="bm-icon" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                            <svg class="bm-icon" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                            <svg class="bm-icon" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                            <svg class="bm-icon" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                        </span>
+                        <span class="product-review">4.9 (210)</span>
+                    </div>
+                    <div class="product-unit">Per 20L bucket</div>
+                    <div class="product-price-row">
+                        <span class="product-price-now">D2,500</span>
+                        <span class="product-price-was">D2,800</span>
+                    </div>
+                    <div class="product-stock"><span class="dot"></span>In Stock</div>
+                    <div class="product-delivery">
+                        <svg class="bm-icon bm-icon-xs" viewBox="0 0 24 24"><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
+                        Delivery in 2–3 days
+                    </div>
+                    <button class="add-cart-btn" onclick="event.stopPropagation(); addToCart(5)">Add to Cart</button>
+                </div>
+            </article>
+
+        </div>
+    </section>
+
+    <!-- NEW ARRIVALS — copy one card block to add another -->
+    <section class="section-block">
+        <div class="section-header">
+            <h2 class="section-title">New Arrivals</h2>
+            <a class="section-see-more" href="#">See more
+                <svg class="bm-icon" viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+            </a>
+        </div>
+        <div class="product-grid">
+
+            <!-- NEW ARRIVAL 1 -->
+            <article class="product-card" >
+                <div class="product-media">
+                    <img src="assets/tank.png" alt="Water Tank 1000L" loading="lazy">
+                    <span class="product-badge new">New</span>
+                </div>
+                <div class="product-body">
+                    <div class="product-name">Water Tank — 1000L</div>
+                    <div class="product-rating-row">
+                        <span class="product-stars">
+                            <svg class="bm-icon" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                            <svg class="bm-icon" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                            <svg class="bm-icon" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                            <svg class="bm-icon" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                            <svg class="bm-icon off" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                        </span>
+                        <span class="product-review">4.3 (38)</span>
+                    </div>
+                    <div class="product-unit">Per tank</div>
+                    <div class="product-price-row">
+                        <span class="product-price-now">D4,500</span>
+                        <span class="product-price-was">D5,000</span>
+                    </div>
+                    <div class="product-stock"><span class="dot"></span>In Stock</div>
+                    <div class="product-delivery">
+                        <svg class="bm-icon bm-icon-xs" viewBox="0 0 24 24"><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
+                        Delivery in 3–5 days
+                    </div>
+                    <button class="add-cart-btn" onclick="event.stopPropagation(); addToCart(7)">Add to Cart</button>
+                </div>
+            </article>
+
+            <!-- NEW ARRIVAL 2 -->
+            <article class="product-card" >
+                <div class="product-media">
+                    <img src="assets/pvc.png" alt="Electrical Cable 100m" loading="lazy">
+                    <span class="product-discount">-10%</span>
+                </div>
+                <div class="product-body">
+                    <div class="product-name">PVC Pipe</div>
+                    <div class="product-rating-row">
+                        <span class="product-stars">
+                            <svg class="bm-icon" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                            <svg class="bm-icon" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                            <svg class="bm-icon" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                            <svg class="bm-icon" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                            <svg class="bm-icon" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                        </span>
+                        <span class="product-review">4.7 (79)</span>
+                    </div>
+                    <div class="product-unit">Per 100m roll</div>
+                    <div class="product-price-row">
+                        <span class="product-price-now">D1,800</span>
+                        <span class="product-price-was">D2,000</span>
+                    </div>
+                    <div class="product-stock"><span class="dot"></span>In Stock</div>
+                    <div class="product-delivery">
+                        <svg class="bm-icon bm-icon-xs" viewBox="0 0 24 24"><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
+                        Delivery in 1–3 days
+                    </div>
+                    <button class="add-cart-btn" onclick="event.stopPropagation(); addToCart(8)">Add to Cart</button>
+                </div>
+            </article>
+
+            <!-- NEW ARRIVAL 3 -->
+            <article class="product-card">
+                <div class="product-media">
+                    <img src="assets/rod.png" alt="Shovel & Spade Set" loading="lazy">
+                    <span class="product-badge sale">Sale</span>
+                    <span class="product-discount">-20%</span>
+                </div>
+                <div class="product-body">
+                    <div class="product-name">high steel Rod</div>
+                    <div class="product-rating-row">
+                        <span class="product-stars">
+                            <svg class="bm-icon" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                            <svg class="bm-icon" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                            <svg class="bm-icon" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                            <svg class="bm-icon" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                            <svg class="bm-icon off" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                        </span>
+                        <span class="product-review">4.2 (21)</span>
+                    </div>
+                    <div class="product-unit">Per set of 2</div>
+                    <div class="product-price-row">
+                        <span class="product-price-now">D400</span>
+                        <span class="product-price-was">D500</span>
+                    </div>
+                    <div class="product-stock"><span class="dot"></span>In Stock</div>
+                    <div class="product-delivery">
+                        <svg class="bm-icon bm-icon-xs" viewBox="0 0 24 24"><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
+                        Delivery in 1–2 days
+                    </div>
+                    <button class="add-cart-btn" onclick="event.stopPropagation(); addToCart(11)">Add to Cart</button>
+                </div>
+            </article>
+            <!-- NEW ARRIVAL 4 -->
+            <article class="product-card">
+                <div class="product-media">
+                    <img src="assets/paint.png" alt="Shovel & Spade Set" loading="lazy">
+                    <span class="product-badge sale">Sale</span>
+                    <span class="product-discount">-20%</span>
+                </div>
+                <div class="product-body">
+                    <div class="product-name">Premium Paint</div>
+                    <div class="product-rating-row">
+                        <span class="product-stars">
+                            <svg class="bm-icon" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                            <svg class="bm-icon" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                            <svg class="bm-icon" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                            <svg class="bm-icon" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                            <svg class="bm-icon off" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                        </span>
+                        <span class="product-review">4.2 (21)</span>
+                    </div>
+                    <div class="product-unit">Per set of 2</div>
+                    <div class="product-price-row">
+                        <span class="product-price-now">D400</span>
+                        <span class="product-price-was">D500</span>
+                    </div>
+                    <div class="product-stock"><span class="dot"></span>In Stock</div>
+                    <div class="product-delivery">
+                        <svg class="bm-icon bm-icon-xs" viewBox="0 0 24 24"><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
+                        Delivery in 1–2 days
+                    </div>
+                    <button class="add-cart-btn" onclick="event.stopPropagation(); addToCart(11)">Add to Cart</button>
+                </div>
+            </article>
+            <!-- NEW ARRIVAL 5 -->
+            <article class="product-card">
+                <div class="product-media">
+                    <img src="assets/spade.png" alt="Shovel & Spade Set" loading="lazy">
+                    <span class="product-badge sale">Sale</span>
+                    <span class="product-discount">-20%</span>
+                </div>
+                <div class="product-body">
+                    <div class="product-name">Shovel & Spade Set</div>
+                    <div class="product-rating-row">
+                        <span class="product-stars">
+                            <svg class="bm-icon" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                            <svg class="bm-icon" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                            <svg class="bm-icon" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                            <svg class="bm-icon" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                            <svg class="bm-icon off" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                        </span>
+                        <span class="product-review">4.2 (21)</span>
+                    </div>
+                    <div class="product-unit">Per set of 2</div>
+                    <div class="product-price-row">
+                        <span class="product-price-now">D400</span>
+                        <span class="product-price-was">D500</span>
+                    </div>
+                    <div class="product-stock"><span class="dot"></span>In Stock</div>
+                    <div class="product-delivery">
+                        <svg class="bm-icon bm-icon-xs" viewBox="0 0 24 24"><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
+                        Delivery in 1–2 days
+                    </div>
+                    <button class="add-cart-btn" onclick="event.stopPropagation(); addToCart(11)">Add to Cart</button>
+                </div>
+            </article>
+        </div>
+    </section>
+</main>
+
+<!-- ============================================================
+     FOOTER — fully static, edit text and links directly.
+     ============================================================ -->
+<footer class="footer" id="site-footer">
+    <div class="footer-inner">
+        <div class="footer-col">
+            <h4>About</h4>
+            <ul>
+                <li onclick="navigate('contact')">Contact Us</li>
+                <li onclick="navigate('about')">About</li>
+                <li>Careers</li>
+                <li>Our Services</li>
+            </ul>
+        </div>
+        <div class="footer-col">
+            <h4>Customer Service</h4>
+            <ul>
+                <li>Delivery</li>
+                <li>Returns & Refunds</li>
+                <li>FAQs</li>
+                <li>Payment Methods</li>
+            </ul>
+        </div>
+        <div class="footer-col">
+            <h4>Categories</h4>
+            <ul>
+                <li onclick="navigate('category','Cement')">Cement</li>
+                <li onclick="navigate('category','Roofing')">Roofing</li>
+                <li onclick="navigate('category','Steel')">Steel</li>
+                <li onclick="navigate('category','Plumbing')">Plumbing</li>
+                <li onclick="navigate('category','Electrical')">Electrical</li>
+                <li onclick="navigate('category','Hardware')">Hardware</li>
+            </ul>
+        </div>
+        <div class="footer-col">
+            <h4>Policies</h4>
+            <ul>
+                <li>Privacy Policy</li>
+                <li>Terms</li>
+                <li>Shipping</li>
+                <li>Returns</li>
+            </ul>
+        </div>
+        <div class="footer-col">
+            <h4>Contact</h4>
+            <p>Jimpex Road<br>Banjul, The Gambia.<br><br>+220 123 4567<br>support@vanyasbuildmart.com</p>
+        </div>
+    </div>
+    <div class="footer-bottom">
+        <div>© 2026 BuildMart. All rights reserved.</div>
+        <div class="footer-social">
+            <a href="#" aria-label="Facebook">
+                <svg class="bm-icon" viewBox="0 0 24 24"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg>
+            </a>
+            <a href="#" aria-label="Twitter">
+                <svg class="bm-icon" viewBox="0 0 24 24"><path d="M23 3a10.9 10.9 0 0 1-3.14 1.53 4.48 4.48 0 0 0-7.86 3v1A10.66 10.66 0 0 1 3 4s-4 9 5 13a11.64 11.64 0 0 1-7 2c9 5 20 0 20-11.5a4.5 4.5 0 0 0-.08-.83A7.72 7.72 0 0 0 23 3z"/></svg>
+            </a>
+            <a href="#" aria-label="Instagram">
+                <svg class="bm-icon" viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="20" rx="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
+            </a>
+            <a href="#" aria-label="YouTube">
+                <svg class="bm-icon" viewBox="0 0 24 24"><path d="M22.54 6.42a2.78 2.78 0 0 0-1.94-2C18.88 4 12 4 12 4s-6.88 0-8.6.46a2.78 2.78 0 0 0-1.94 2A29 29 0 0 0 1 11.75a29 29 0 0 0 .46 5.33A2.78 2.78 0 0 0 3.4 19c1.72.46 8.6.46 8.6.46s6.88 0 8.6-.46a2.78 2.78 0 0 0 1.94-2 29 29 0 0 0 .46-5.25 29 29 0 0 0-.46-5.33z"/><polygon points="9.75 15.02 15.5 11.75 9.75 8.48 9.75 15.02"/></svg>
+            </a>
+        </div>
+    </div>
+</footer>
+
+<!-- JavaScript — interactions + dynamic content only -->
+<script src="script.js"></script>
+</body>
+</html>
